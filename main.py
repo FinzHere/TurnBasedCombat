@@ -103,7 +103,8 @@ while mainmenucon:
                     player = Player("", 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0)
                     player.load(1)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
-                    print(player.player_name)
+                    mainmenucon = False
+                    break
             elif profile == "2":
                 if not(os.path.exists("Saves/P2.json")):
                     create_profile(2)
@@ -115,7 +116,8 @@ while mainmenucon:
                     player = Player("", 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0)
                     player.load(2)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
-                    print(player.player_name)
+                    mainmenucon = False
+                    break
             elif profile == "3":
                 if not(os.path.exists("Saves/P3.json")):
                     create_profile(3)
@@ -127,6 +129,8 @@ while mainmenucon:
                     player = Player("", 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0)
                     player.load(3)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
+                    mainmenucon = False
+                    break
     elif mainmenu == "2":
         print("Empty for now!")
     elif mainmenu == "3":
