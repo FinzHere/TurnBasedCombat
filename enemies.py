@@ -69,6 +69,3 @@ class Enemy:
             print(f"You defeated {self.name}!")
             return True
         return False
-
-    def defeatPlayer(self):
-        pass
