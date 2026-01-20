@@ -224,12 +224,12 @@ while mainmenucon:
             elif profile == "1":
                 if not(os.path.exists("Saves/P1.json")):
                     create_profile(1)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P1.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}), 0
                     player.load(1)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -237,12 +237,12 @@ while mainmenucon:
             elif profile == "2":
                 if not(os.path.exists("Saves/P2.json")):
                     create_profile(2)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P2.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.load(2)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -250,12 +250,12 @@ while mainmenucon:
             elif profile == "3":
                 if not(os.path.exists("Saves/P3.json")):
                     create_profile(3)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P3.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.load(3)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
