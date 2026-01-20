@@ -11,6 +11,6 @@ There are currently no releases. If you want to play, go to the green "<>Code" b
 
 If the game is working, it will say beneath this line
 
-STATUS: NOT SURE
+STATUS: YES, KIND OF
 
 I hope you enjoy this project!
