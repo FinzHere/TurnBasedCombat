@@ -9,4 +9,8 @@ This game is nowhere near complete. This is just the start, and I wanna work on 
 ## How to install
 There are currently no releases. If you want to play, go to the green "<>Code" button and click "Download ZIP". Once this is downloaded, extract it to a file of your choosing. You HAVE to put main.py and enemies.py into the same folder, and I would recommend putting these two into a seperate file so they don't get mixed up with other files.
 
+If the game is working, it will say beneath this line
+
+STATUS: NOT SURE
+
 I hope you enjoy this project!
