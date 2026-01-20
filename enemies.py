@@ -17,7 +17,7 @@ slime = {
 }
 
 goblin = {
-    "name":"Slime",
+    "name":"Goblin",
     "max_health":13.5,
     "current_health":13.5,
     "attacks":{
@@ -31,7 +31,7 @@ goblin = {
 }
 
 
-enemiesg1 = [slime]
+enemiesg1 = [slime, goblin]
 attack = 1
 attack = float(attack)
 
@@ -47,14 +47,17 @@ class Enemy:
     def spawn(self, ek: int):
         if ek <= 3:
             newenemy = slime
+        else:
+            newenemy = rd.choice(enemiesg1)
         self.__dict__.update(newenemy)
         self.attack = attack
     
-    def attackPlayer(self, ed: int):
+    def attackPlayer(self):
         sattack = rd.choice(list(self.attacks.keys()))
 
         if sattack == "Heal":
-            heal_amount = float(self.attacks[sattack])
+            heal_amount = float(self.attacks[sattack]) * self.attack
+            heal_amount = round(heal_amount, 1)
             print(f"{self.name} healed for {heal_amount}!")
             return {"type": "heal", "amount": heal_amount}
         else:

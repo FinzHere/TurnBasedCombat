@@ -229,7 +229,7 @@ while mainmenucon:
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P1.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}), 0
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0)
                     player.load(1)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -338,9 +338,10 @@ while True:
         print("\nGoodbye, traveller!")
         sys.exit()
     elif play == "1":
+        gameloop = True
         os.system('cls' if os.name == 'nt' else 'clear')
         while gameloop:
-            enemy.spawn()
+            enemy.spawn(player.enemies_killed)
             fighting = True
             has_encountered = False
             enemy_turn = False
