@@ -8,7 +8,7 @@ slime = {
     "current_health":9.8,
     "attacks":{
         "Bounce":2.5,
-        "Heal":0.7,
+        "hHeal":0.7,
         "Do Nothing":0,
         "Bite":3,
     },
@@ -20,10 +20,10 @@ RockGolem = {
     "max_health":15.676767,
     "current_health":15,
     "attacks":{
-        "Slam":7,
-        "Heal":0.7,
-        "Do Nothing": -2,
-        "Chew":4,
+        "Slam":8,
+        "hRock Regenerate":0.7,
+        "Do Nothing": 0,
+        "Chew":5,
     },
     "attack":1,
     "exp": 5,
@@ -35,7 +35,7 @@ goblin = {
     "current_health":13.5,
     "attacks":{
         "Charge":3.5,
-        "Heal":1.3,
+        "hHeal":1.3,
         "it's Pickaxe":6.25,
         "Bite":3,
     },
