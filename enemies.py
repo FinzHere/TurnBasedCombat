@@ -15,6 +15,19 @@ slime = {
     "attack":1,
     "exp": 5,
 }
+RockGolem = {
+    "name":"Rock Golem",
+    "max_health":15.676767,
+    "current_health":15,
+    "attacks":{
+        "Slam":7,
+        "Heal":0.7,
+        "Do Nothing": -2,
+        "Chew":4,
+    },
+    "attack":1,
+    "exp": 5,
+}
 
 goblin = {
     "name":"Goblin",
@@ -23,7 +36,7 @@ goblin = {
     "attacks":{
         "Charge":3.5,
         "Heal":1.3,
-        "it's Pickaxe":5.5,
+        "it's Pickaxe":6.25,
         "Bite":3,
     },
     "attack":1,
@@ -32,8 +45,10 @@ goblin = {
 
 
 enemiesg1 = [slime, goblin]
+enemiesg2 = [slime, goblin, RockGolem]
 attack = 1
-attack = float(attack)
+attack = round(attack, 2)
+
 
 class Enemy:
     def __init__(self, name: str, max_health: float, current_health: float, attacks: dict, attack: float, exp: int):
@@ -44,26 +59,35 @@ class Enemy:
         self.attack = attack
         self.exp = exp
 
-    def spawn(self, ek: int):
+    def spawn(self, ek: int, ed: float):
         if ek <= 3:
             newenemy = slime
+        elif 3 < ek < 15:
+            newenemy = rd.choice(enemiesg1)
+        elif ek >= 15:
+            newenemy = rd.choice(enemiesg2)
         else:
             newenemy = rd.choice(enemiesg1)
+        newenemy["max_health"] = newenemy["max_health"] * ed
+        newenemy["current_health"] = newenemy["current_health"] * ed
+        newenemy["attack"] = newenemy["attack"] * ed
+        newenemy["max_health"] = round(newenemy["max_health"], 2)
+        newenemy["current_health"] = round(newenemy["current_health"], 2)
+        newenemy["attack"] = round(newenemy["attack"], 2)
         self.__dict__.update(newenemy)
-        self.attack = attack
     
     def attackPlayer(self):
         sattack = rd.choice(list(self.attacks.keys()))
 
-        if sattack == "Heal":
+        if sattack.startswith("h"):
             heal_amount = float(self.attacks[sattack]) * self.attack
             heal_amount = round(heal_amount, 1)
-            print(f"{self.name} healed for {heal_amount}!")
+            print(f"{self.name} used {sattack} {heal_amount}!")
             return {"type": "heal", "amount": heal_amount}
         else:
             damage = float(self.attacks[sattack]) * self.attack
             damage = round(damage, 1)
-            print(f"{self.name} used {sattack} and dealt {damage} damage!")
+            print(f"{self.name} used {sattack} and dealt {damage} damage!\n")
             return {"type": "damage", "amount": damage}
 
     def die(self):
