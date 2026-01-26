@@ -82,7 +82,7 @@ class Enemy:
         if sattack.startswith("h"):
             heal_amount = float(self.attacks[sattack]) * self.attack
             heal_amount = round(heal_amount, 1)
-            print(f"{self.name} used {sattack} {heal_amount}!")
+            print(f"{self.name} used {sattack[1:]} {heal_amount}!")
             return {"type": "heal", "amount": heal_amount}
         else:
             damage = float(self.attacks[sattack]) * self.attack
