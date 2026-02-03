@@ -1,8 +1,6 @@
 {
-    "Stick": 1,
-    "Rock": 2,
-    "Leaf": 0.005,
-    "Sharp Rock On A Stick": 3,
-    "Sharpend Stick": 2.4,
-    "Mighty Potato(Not So Mighty After All)": -4
+    "Spear": 6.0,
+    "Sturdy Sword": 7.0,
+    "Iron Sword": 8.0,
+    "Strong Sword": 9.0
 }

@@ -1,0 +1,10 @@
+{
+    "Strength Potion": {
+        "type": "strength",
+        "amount": 1.2
+    },
+    "Heal Potion": {
+        "type": "heal",
+        "amount": 4.5
+    }
+}

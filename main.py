@@ -5,19 +5,11 @@ import time
 import sys
 import enemies
 
-allweapons = {}
-with open("Items/ALLWEAPONS.json", "r") as f:
-    allweapons = json.load(f)
-
-allitems = {}
-with open("Items/ALLITEMS.json", "r") as f:
-    allitems = json.load(f)
-
 weapons = {
     "Rusty Sword":5,
 }
 
-L15spells = {
+L10spells = {
     "Mana Burst": 5.5,
     "Astral Flare": 6.5,
     "Hex": 7.7,
@@ -48,6 +40,8 @@ spells_trigger = True
 spell_unlock = False
 
 current_profile = 1
+
+item_counter = 0
 
 mainmenucon = True
 gameloop = True
@@ -163,6 +157,39 @@ class Player:
         self.enemy_dificulty = enemy_dificulty
         self.items = items
 
+    def rundown(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"Hello, {self.player_name}!")
+        print("This guide is here to tell you how to play the game! Press enter to get started! (once you have started the tutorial, press enter to skip it)")
+        input()
+        print(f"\nHOW TO PLAY:")
+        print(f"\nBefore going into battle, which will be explained later, you will get some options. These include:")
+        print(f"Playing\nChanging Weapon\nChanging Armor(not working yet)\nSaving\nQuiting")
+        print(f"For changing weapons and armor, you will be taken to section where all of your weapons and armor are displayed, \nyou just have to input its name and you'll equip it.")
+        print(f"For battling, that's what I'm about to get into.\n")
+        print(f"\nBATTLING: ")
+        print(f"\nIn a battle, you and an oppenent face of, exchanging attacks until only one of you is left standing. \nThere are 4 options you can take in a battle:")
+        print(f"1-Attack with a weapon\n2-Block an incoming attack\n3-Use an item\n4-Run")
+        print(f"\nWhen you attack, you attack with your currently equiped weapon.")
+        print(f"When you block, you block the enemy's attack.")
+        print(f"When you use an item, you can use one of your items. These include things like potions. When used, items take up your turn.")
+        print(f"Running does what you think - you run from the battle.")
+        print(f"\nOnce you have performed one of these actions, it's the enemy's turn.\n")
+        print(f"\nENEMIES: ")
+        print(f"\nEnemies in this game progress with you - as you grow stronger, so do they.")
+        print(f"As you get further you will also start to encounter new enemies, which I'll leave it to you to find out what they are!\n")
+        print(f"\nCHESTS: ")
+        print(f"\nChests appear every few rounds, and they give you new items!")
+        print(f"If you already have an item, don't worry! It will get a boost in it's base damage/amount.")
+        print(f"Chests are very useful items, and they're there to help you. Utilize them to their full potential!\n")
+        print(f"\n\n")
+        print("UNRELEASED CONTENT: ")
+        print(f"\nBOSSES: ")
+        print(f"\nBosses are a planned feature that will appear every ten rounds, and they will be tougher than normal enemies.")
+        print(f"Because of this, they will drop more loot and give more exp! They might even drop special items...")
+        input("\n\nOnce you are ready, press enter!")
+        os.system('cls' if os.name == 'nt' else 'clear')
+
     def save(self):
         file = f"Saves/P{str(current_profile)}.json"
         with open(file, "w") as f:
@@ -204,16 +231,18 @@ class Player:
         print("\nYour Spells:\n")
         for key in self.spells:
             print(key)
-        schoice = str(input("Pick a spell or put back to go back! Spells have to be spelt and capitalized correctly to work!"))
+        schoice = str(input("\nPick a spell or put back to go back! Spells have to be spelt and capitalized correctly to work!\n"))
         if schoice in ["b", "back", "B", "Back"]:
             return "back"
         elif schoice in self.spells:
-            if schoice in heal_spells:
-                amount = heal_spells[schoice]
+            if self.spells[schoice]["type"] == "heal":
+                amount = self.spells[schoice]["amount"]
+                amount = float(amount) * self.magicatk
                 amount = round(amount, 2)
                 return {"type": "heal", "amount": float(amount), "name": schoice}
-            elif schoice in attack_spells:
-                amount = attack_spells[schoice]
+            elif self.spells[schoice]["type"] == "attack":
+                amount = self.spells[schoice]["amount"]
+                amount = float(amount) * self.magicatk
                 amount = round(amount, 2)
                 return {"type": "attack", "amount": float(amount), "name": schoice}
         else:
@@ -225,25 +254,35 @@ class Player:
         for key in self.items:
             print(key)
         print("Type the name of an item to use it, or put b to go back!")
-        while True:
-            itemchoice = input()
-            if itemchoice in ["b", "back", "B", "Back"]:
-                break
-            elif itemchoice in self.items:
-                print("")
+        itemchoice = input()
+        if itemchoice in ["b", "back", "B", "Back"]:
+            return "back"
+        elif (itemchoice in self.items) and item_counter == 0:
+            item_counter = 3
+            item_type = self.items[itemchoice]["type"]
+            if item_type == "heal":
+                amount = self.items[itemchoice]["amount"]
+                return {"type": item_type, "amount": amount, "name": itemchoice}
+            elif item_type == "strength":
+                amount = self.items[itemchoice]["amount"]
+                return {"type": item_type, "amount": amount, "name": itemchoice}
+        elif (itemchoice in self.items):
+            return "not_usable"
+        else:
+            return "not_recognised"
 
     def level_up(self):
         while True:
             exp_needed = int((self.level + 5) * 1.2)
 
-            if self.level >= 15 and not(self.spells):
+            if self.level >= 10 and not(self.spells):
                 print("You find a strange book...")
                 time.sleep(2.75)
                 print("It's a book of spells!")
                 spellanswer = input("Would you like to learn how spells work? (y or yes to know)")
                 if spellanswer in ["y", "yes"]:
                     spellInform()
-                self.spells = L15spells
+                self.spells = L10spells
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print("You unlocked Spells!")
                 time.sleep(1.5)
@@ -261,16 +300,75 @@ class Player:
 
     def openChest(self):
         decider = rd.random()
-        if decider <= 0.75:
-            itemsrarity = rd.random()
-            if itemsrarity <= 0.6:
-                rarity = "common"
+        decider = round(decider, 2)
+        if self.spells:
+            if decider <= 0.4:
+                itype = "WEAPONS"
+            elif 0.41 <= decider <= 0.8:
+                itype = "ITEMS"
             else:
-                rarity = "common"
+                itype = "SPELLS"
         else:
-            itemsrarity = rd.random()
-            if itemsrarity <= 0.6:
-                rarity = "common"
+            if decider <= 0.5:
+                itype = "WEAPONS"
+            else:
+                itype = "ITEMS"
+        rdecider = rd.random()
+        rdecider = round(decider, 2)
+        if rdecider <= 0.57:
+            rarity = "COMMON"
+        elif 0.58 <= rdecider <= 0.80:
+            rarity = "UNCOMMON"
+        elif 0.81 <= rdecider <= 0.95:
+            rarity = "EPIC"
+        else:
+            rarity = "LEGENDARY"
+        path = f"Items/{rarity}{itype}.json"
+        print(f"You found a chest!")
+        time.sleep(2)
+        print(f"The rarity is {rarity}...")
+        time.sleep(2.5)
+        print(f"You got a...")
+        with open(path, "r") as f:
+            available_items: dict = json.load(f)
+        weapon_name = rd.choice(list(available_items.keys()))
+        to_add = available_items[weapon_name]
+        if weapon_name in self.spells:
+            print(f"You got {weapon_name}! It's a spell!")
+            time.sleep(2)
+            print(f"You already have {weapon_name}!")
+            amount = self.spells[weapon_name]["amount"]
+            amount = float(amount) + 0.2
+            self.spells[weapon_name]["amount"] = amount
+            time.sleep(1.5)
+            print(f"You increased {weapon_name}'s power!")
+        elif weapon_name in self.weapons:
+            print(f"You got a {weapon_name}! It's a weapon!")
+            time.sleep(2)
+            print(f"You already have a {weapon_name}!")
+            amount = self.weapons[weapon_name]
+            amount = float(amount) + 0.2
+            self.weapons[weapon_name] = amount
+            time.sleep(1.5)
+            print(f"You increased {weapon_name}'s power!")
+        elif weapon_name in self.items:
+            print(f"You got a {weapon_name}! It's an item!")
+            time.sleep(2)
+            print(f"You already have a {weapon_name}!")
+            amount = self.items[weapon_name]["amount"]
+            amount = float(amount) + 0.2
+            self.items[weapon_name]["amount"] = amount
+            time.sleep(1.5)
+            print(f"You increased {weapon_name}'s power!")
+        elif (itype.lower()) == "weapons":
+            self.weapons[weapon_name] = to_add
+            print(f"You got a {weapon_name} (weapon)!")
+        elif (itype.lower()) == "spells":
+            self.spells[weapon_name] = to_add
+            print(f"You got a {weapon_name} (spell)!")
+        elif (itype.lower()) == "items":
+            self.items[weapon_name] = to_add
+            print(f"You got a {weapon_name} (item)!")
     
     def die(self):
         if round(self.current_hp, 1) <= 0:
@@ -292,6 +390,9 @@ class Player:
                 print(key)
             print(f"\nALL SPELLS: ")
             for key in self.spells:
+                print(key)
+            print(f"\nALL ITEMS: ")
+            for key in self.items:
                 print(key)
             print(f"\nMELEE ATTACK MULTI: {round(self.melee, 2)}")
             print(f"\nMAGIC ATTACK MULTI: {round(self.magicatk, 2)}")
@@ -418,6 +519,12 @@ input_t = "1-Play game, 2-Change Weapon, 3-Save, 4-Save and Quit\n"
 
 while True:
     player.level_up()
+    if player.enemies_killed == 0:
+        rundown = input("Would you like a rundown on how the game works (press y or yes to accept)?").strip().lower()
+        if rundown in ["y", "yes"]:
+            player.rundown()
+        else:
+            os.system('cls' if os.name == 'nt' else 'clear')
     if player.enemies_killed >= 1:
         input_t = "1-Continue game, 2-Change Weapon, 3-Save, 4-Save and Quit\n"
     play = str(input(input_t).strip())
@@ -462,6 +569,7 @@ while True:
                     print(f"You encountered a wild {enemy.name}!")
                     has_encountered = True
                     time.sleep(1.75)
+
                 while enemy_turn and (not(stop)):
                     eattack = enemy.attackPlayer()
                     if eattack["type"] == "heal":
@@ -488,7 +596,7 @@ while True:
                     player_turn = False
                     stop = True
 
-                print(f"{enemy.name} HEALTH: {enemy.current_health}")
+                print(f"\n{enemy.name} HEALTH: {enemy.current_health}")
 
                 while player_turn and (not(stop)):
                     print("\nWhat would you like to do?")
@@ -511,21 +619,19 @@ while True:
                             continue
                         elif spell["type"] == "heal":
                             amount_to_add = player.current_hp + spell["amount"]
-                            amount_to_add = amount_to_add * player.magicatk
                             amount_to_add = round(amount_to_add, 2)
                             player.current_hp = amount_to_add
                             print(f"\nYou used {spell["name"]} and healed {amount_to_add} HP!")
                             if player.current_hp > player.max_hp:
                                 print("\nYou are now max HP!")
                                 player.current_hp = player.max_hp
-                            print(f"\nPlayer Health is now {player.current_hp}!")
+                            print(f"\nPlayer Health is now {player.current_hp}!\n")
                         elif spell["type"] == "attack":
                             damage = spell["amount"]
-                            damage = damage * player.magicatk
-                            damage = round(damage, 2)
                             enemy.current_health -= damage
-                            print(f"You used {spell["name"]} against {enemy.name} and dealt {damage} damage!")
-                            print(f"{enemy.name} HEALTH: {enemy.current_health}")
+                            enemy.current_health = round(enemy.current_health, 1)
+                            print(f"\nYou used {spell["name"]} against {enemy.name} and dealt {damage} damage!")
+                            print(f"{enemy.name} HEALTH: {enemy.current_health}\n")
                             
                     elif choice == "4":
                         print(f"\nYou ran away from {enemy.name}!")

@@ -1,0 +1,10 @@
+{
+    "Mystical Recovery": {
+        "type": "heal",
+        "amount": 6.0
+    },
+    "Ancient Regenerate": {
+        "type": "heal",
+        "amount": 8.5
+    }
+}

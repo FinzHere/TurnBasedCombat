@@ -26,7 +26,7 @@ RockGolem = {
         "Chew":5,
     },
     "attack":1,
-    "exp": 5,
+    "exp": 13,
 }
 
 goblin = {
@@ -71,9 +71,12 @@ class Enemy:
         newenemy["max_health"] = newenemy["max_health"] * ed
         newenemy["current_health"] = newenemy["current_health"] * ed
         newenemy["attack"] = newenemy["attack"] * ed
+        newenemy["exp"] = float(newenemy["exp"]) * ed
         newenemy["max_health"] = round(newenemy["max_health"], 2)
         newenemy["current_health"] = round(newenemy["current_health"], 2)
         newenemy["attack"] = round(newenemy["attack"], 2)
+        newenemy["exp"] = round(newenemy["exp"])
+        newenemy["exp"] = int(newenemy["exp"])
         self.__dict__.update(newenemy)
     
     def attackPlayer(self):
