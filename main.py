@@ -33,7 +33,10 @@ armor = {
 }
 
 items = {
-
+    "Heal Potion": {
+        "type": "heal",
+        "amount": 4.5
+    }
 }
 
 spells_trigger = True
@@ -48,6 +51,8 @@ gameloop = True
 fighting = True
 player_turn = True
 enemy_turn = False
+
+str_amount = 0
 
 stop = False
 
@@ -172,7 +177,7 @@ class Player:
         print(f"1-Attack with a weapon\n2-Block an incoming attack\n3-Use an item\n4-Run")
         print(f"\nWhen you attack, you attack with your currently equiped weapon.")
         print(f"When you block, you block the enemy's attack.")
-        print(f"When you use an item, you can use one of your items. These include things like potions. When used, items take up your turn.")
+        print(f"When you use an item, you can use one of your items. These include things like potions. When used, items take up your turn. They also have a cooldown.")
         print(f"Running does what you think - you run from the battle.")
         print(f"\nOnce you have performed one of these actions, it's the enemy's turn.\n")
         print(f"\nENEMIES: ")
@@ -182,6 +187,9 @@ class Player:
         print(f"\nChests appear every few rounds, and they give you new items!")
         print(f"If you already have an item, don't worry! It will get a boost in it's base damage/amount.")
         print(f"Chests are very useful items, and they're there to help you. Utilize them to their full potential!\n")
+        print(f"\nLEVEL-UPS: ")
+        print(f"\nEvery time that you defeat an enemy, you get exp. If you get enough exp, you will level-up!")
+        print(f"Level ups are your way to build up your stats. It will be a random stat each time, so prepare for every scenario!\n")
         print(f"\n\n")
         print("UNRELEASED CONTENT: ")
         print(f"\nBOSSES: ")
@@ -213,7 +221,7 @@ class Player:
                 time.sleep(2.5)
             current_profile = pn
     
-    def attack(self, enemy_health):
+    def attack(self, enemy_health, enemy_name):
         print(enemy_health)
         key = self.current_weapon
         try:
@@ -222,7 +230,8 @@ class Player:
             damage = damage * self.melee
             enemy_health = enemy_health - damage
             enemy_health = round(enemy_health, 1)
-            print(f"{enemy_health}")
+            print(f"\nYou attacked {enemy_name} for {damage} HP!")
+            print(f"{enemy_name} is now {enemy_health} HP!")
             return enemy_health
         except KeyError:
             print("It did not work bc my coding is bad lol")
@@ -237,20 +246,26 @@ class Player:
         elif schoice in self.spells:
             if self.spells[schoice]["type"] == "heal":
                 amount = self.spells[schoice]["amount"]
-                amount = float(amount) * self.magicatk
-                amount = round(amount, 2)
-                return {"type": "heal", "amount": float(amount), "name": schoice}
+                if self.current_mana >= amount:
+                    amount = float(amount) * self.magicatk
+                    amount = round(amount, 2)
+                    return {"type": "heal", "amount": float(amount), "name": schoice}
+                else:
+                    return "oom"
             elif self.spells[schoice]["type"] == "attack":
                 amount = self.spells[schoice]["amount"]
-                amount = float(amount) * self.magicatk
-                amount = round(amount, 2)
-                return {"type": "attack", "amount": float(amount), "name": schoice}
+                if self.current_mana >= amount:
+                    amount = float(amount) * self.magicatk
+                    amount = round(amount, 2)
+                    return {"type": "attack", "amount": float(amount), "name": schoice}
+                else:
+                    return "oom"
         else:
             print(f"\nSorry, {schoice} is not a recognised input. Please make sure that your spelling is correct and try again!")
             return "back"
     
-    def useItem(self, enemy_health):
-        print("YOUR ITEMS:")
+    def useItem(self):
+        print("\nYOUR ITEMS:")
         for key in self.items:
             print(key)
         print("Type the name of an item to use it, or put b to go back!")
@@ -266,8 +281,12 @@ class Player:
             elif item_type == "strength":
                 amount = self.items[itemchoice]["amount"]
                 return {"type": item_type, "amount": amount, "name": itemchoice}
+            elif item_type == "mana":
+                amount = self.items[itemchoice]["amount"]
+                return {"type": item_type, "amount": amount, "name": itemchoice}
+
         elif (itemchoice in self.items):
-            return "not_usable"
+            return "cooldown"
         else:
             return "not_recognised"
 
@@ -293,6 +312,18 @@ class Player:
                 self.level += 1
 
                 print(f"You Leveled Up! You are now level {self.level}\n")
+                stats = ["mana", "melee", "magic"]
+                stat = rd.choice(stats)
+                if stat == "mana":
+                    print(f"You gained some mana!\n")
+                    self.max_mana += 2
+                    self.current_mana += 2
+                elif stat == "melee":
+                    print(f"You gained some strength!\n")
+                    self.melee += 0.25
+                elif stat == "magic":
+                    print(f"You gained magic attack points!\n")
+                    self.magicatk += 0.25
                 self.enemy_dificulty += 0.1
                 time.sleep(2)
             else:
@@ -617,6 +648,8 @@ while True:
                         spell = player.useSpell()
                         if spell == "back":
                             continue
+                        elif spell == "oom":
+                            print(f"\nSorry, you do not have enough mana!")
                         elif spell["type"] == "heal":
                             amount_to_add = player.current_hp + spell["amount"]
                             amount_to_add = round(amount_to_add, 2)
@@ -643,8 +676,34 @@ while True:
                         break
 
                     elif choice == "3":
-                        print("ITEMS HERE")
-                    
+                        itemchoice = player.useItem()
+                        if itemchoice == "oom":
+                            print("\nYou are on cooldown!")
+                            continue
+                        elif itemchoice == "not_recognised":
+                            print("\nSorry, the system did not recognise your input! Try again and spell it correctly!")
+                        elif itemchoice["type"] == "heal":
+                            print(f"\nYou used a {itemchoice["name"]} and healed {itemchoice["amount"]} HP!")
+                            amount = itemchoice["amount"]
+                            player.current_hp += amount
+                            if player.current_hp >= player.max_hp:
+                                player.current_hp = player.max_hp
+                                print(f"\nYou are now max health, at {player.current_hp} HP!")
+                            else:
+                                print(f"\nYou are now {player.current_hp} HP!")
+                        elif itemchoice["type"] == "strength":
+                            str_amount = itemchoice["amount"]
+                            player.melee += str_amount
+                            print(f"\nYou gained {str_amount} strength!")
+                        elif itemchoice["type"] == "mana":
+                            mana_amount = itemchoice["amount"]
+                            print(f"You gained {mana_amount} mana!")
+                            player.current_mana += mana_amount
+                            if player.current_mana >= player.max_mana:
+                                player.current_mana = player.max_mana
+                                print(f"You are now at max mana, with {player.current_mana} mana!")
+                            else:
+                                print(f"You are now at {player.current_mana} mana!")
                     else:
                         print(f"Sorry, {choice} is not one of the available options! Please pick again!")
                         continue
