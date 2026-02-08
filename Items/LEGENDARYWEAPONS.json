@@ -1,6 +1,7 @@
 {
-    "Poseidon's Trident": {
-        "type": "attack",
-        "amount": 35.0
-    }
+    "Poseidon's Trident": 32.5,
+    "Zeus's Bolt": 36.8,
+    "Colossal Great Sword": 33.5,
+    "Legendary Spear": 32.5,
+    "Legendary Sword": 33.0
 }

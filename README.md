@@ -11,7 +11,7 @@ There are currently no releases. If you want to play, go to the green "<>Code" b
 
 If the game is working, it will say beneath this line
 
-## STATUS: VERY NEARLY FINISHED, MIGHT BE WORKING NOW!!
+## STATUS: IT'S WORKING BUT NOWHERE NEAR BALANCED
 
 Make sure to keep your game up to date!
 

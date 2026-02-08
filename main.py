@@ -9,7 +9,7 @@ weapons = {
     "Rusty Sword": 5.0,
 }
 
-L10spells = {
+L5spells = {
     "Mana Burst": {
         "type": "attack",
         "amount": 5.5
@@ -32,22 +32,22 @@ spells = {
 
 }
 
-heal_spells = {}
-with open("Items/HEALSPELLS.json") as f:
-    heal_spells = json.load(f)
-
-attack_spells = {}
-with open("Items/ATTACKSPELLS.json") as f:
-    attack_spells = json.load(f)
-
 armor = {
 
 }
 
 items = {
-    "Heal Potion": {
+    "Strength Potion": {
+        "type": "strength",
+        "amount": 0.15
+    },
+    "Health Potion": {
         "type": "heal",
-        "amount": 4.5
+        "amount": 7.0
+    },
+    "Mana Potion": {
+        "type": "mana",
+        "amount": 6.0
     }
 }
 
@@ -114,6 +114,8 @@ show_player_dict = {
     "enemies_killed":0,
     "spells":spells,
     "items":items,
+    "item_cooldown": 0,
+    "chest_counter": 3
 }
 
 descriptive_names = {
@@ -133,6 +135,8 @@ descriptive_names = {
     "enemies_killed":"ENEMIES KILLED",
     "spells":"SPELLS",
     "items":"ITEMS",
+    "item_cooldown":"ITEM COOLDOWN",
+    "chest_counter":"ROUNDS UNTIL NEXT CHEST"
 }
 
 def spellInform():
@@ -209,6 +213,7 @@ class Player:
         print(f"\nCHESTS: ")
         print(f"\nChests appear every few rounds, and they give you new items!")
         print(f"If you already have an item, don't worry! It will get a boost in it's base damage/amount.")
+        print(f"Chests will only show up after you defeat a few enemies.")
         print(f"Chests are very useful items, and they're there to help you. Utilize them to their full potential!\n")
         print(f"\nLEVEL-UPS: ")
         print(f"\nEvery time that you defeat an enemy, you get exp. If you get enough exp, you will level-up!")
@@ -253,9 +258,9 @@ class Player:
             damage = float(damage)
             damage = damage * self.melee
             enemy_health = enemy_health - damage
-            enemy_health = round(enemy_health, 1)
+            enemy_health = round(enemy_health, 2)
             print(f"\nYou attacked {enemy_name} for {damage} HP!")
-            print(f"{enemy_name} is now {enemy_health} HP!")
+            print(f"{enemy_name} is now {enemy_health} HP!\n")
             return enemy_health
         except KeyError:
             print("It did not work bc my coding is bad lol")
@@ -325,14 +330,14 @@ class Player:
         while True:
             exp_needed = int((self.level + 5) * 1.2)
 
-            if self.level >= 10 and not(self.spells):
+            if self.level >= 5 and not(self.spells):
                 print("You find a strange book...")
                 time.sleep(2.75)
                 print("It's a book of spells!")
                 spellanswer = input("Would you like to learn how spells work? (y or yes to know)")
                 if spellanswer in ["y", "yes"]:
                     spellInform()
-                self.spells = L10spells
+                self.spells = L5spells
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print("You unlocked Spells!")
                 time.sleep(1.5)
@@ -343,20 +348,30 @@ class Player:
                 self.level += 1
 
                 print(f"You Leveled Up! You are now level {self.level}\n")
-                stats = ["mana", "melee", "magic"]
+                stats = ["mana", "melee", "magic", "health"]
                 stat = rd.choice(stats)
                 if stat == "mana":
                     print(f"You gained some mana!\n")
                     self.max_mana += 2
                     self.current_mana += 2
+                    self.max_mana = round(self.max_mana, 2)
+                    self.current_mana = round(self.current_mana, 2)
                 elif stat == "melee":
                     print(f"You gained some strength!\n")
                     self.melee += 0.25
+                    self.melee = round(self.melee, 2)
                 elif stat == "magic":
                     print(f"You gained magic attack points!\n")
                     self.magicatk += 0.25
-                self.enemy_dificulty += 0.1
-                self.enemy_dificulty = round(self.enemy_dificulty, 1)
+                    self.magicatk = round(self.magicatk, 2)
+                elif stat == "health":
+                    print(f"You gained some HP!\n")
+                    self.max_hp += 2
+                    self.current_hp += 2
+                    self.max_hp = round(self.max_hp, 2)
+                    self.current_hp = round(self.current_hp, 2)
+                self.enemy_dificulty += 0.05
+                self.enemy_dificulty = round(self.enemy_dificulty, 2)
                 time.sleep(2)
             else:
                 break
@@ -552,8 +567,9 @@ while mainmenucon:
                 show_player_dict = json.load(f)
             print("--- PROFILE 2 STATISTICS ---")
             for key, value in show_player_dict.items():
-                label = descriptive_names.get(key, key)
-                print(f"{label}: {value}")
+                if not(key == "enemy_difficulty"):
+                    label = descriptive_names.get(key, key)
+                    print(f"{label}: {value}")
             print("\n")
         else:
             print("--- PROFILE 2 - EMPTY ---")
@@ -563,8 +579,9 @@ while mainmenucon:
                 show_player_dict = json.load(f)
             print("--- PROFILE 3 STATISTICS ---")
             for key, value in show_player_dict.items():
-                label = descriptive_names.get(key, key)
-                print(f"{label}: {value}")
+                if not(key == "enemy_difficulty"):
+                    label = descriptive_names.get(key, key)
+                    print(f"{label}: {value}")
             print("\n")
         else:
             print("--- PROFILE 3 - EMPTY ---")
@@ -647,6 +664,7 @@ while True:
                         enemy_turn = False
                     elif eattack["type"] == "damage":
                         player.current_hp -= eattack["amount"]
+                        player.current_hp = round(player.current_hp, 2)
                         if player.current_hp > 0:
                             print(f"Your HP is now {player.current_hp}!\n")
                             time.sleep(1.5)
@@ -661,7 +679,12 @@ while True:
                     player_turn = False
                     stop = True
 
-                print(f"\n{enemy.name} HEALTH: {enemy.current_health}")
+                print(f"\n{enemy.name} HEALTH: {enemy.current_health}\n")
+                print(f"Player Max HP: {player.max_hp}")
+                print(f"Player Current HP: {player.current_hp}")
+                print(f"Player Max Mana: {player.max_mana}")
+                print(f"Player Current Mana: {player.current_mana}")
+                print(f"Player Strength: {player.melee * (player.weapons[player.current_weapon])}")
 
                 while player_turn and (not(stop)):
                     if player.item_cooldown > 0:
@@ -699,9 +722,9 @@ while True:
                         elif spell["type"] == "attack":
                             damage = spell["amount"]
                             enemy.current_health -= damage
-                            enemy.current_health = round(enemy.current_health, 1)
+                            enemy.current_health = round(enemy.current_health, 2)
                             print(f"\nYou used {spell["name"]} against {enemy.name} and dealt {damage} damage!")
-                            print(f"You are now at {player.current_mana} MANA!")
+                            print(f"You are now at {player.current_mana} MANA!\n")
                             print(f"{enemy.name} HEALTH: {enemy.current_health}\n")
                             
                     elif choice == "4":
@@ -727,19 +750,24 @@ while True:
                             print(f"\nYou used a {itemchoice["name"]} and healed {itemchoice["amount"]} HP!")
                             amount = itemchoice["amount"]
                             player.current_hp += amount
+                            player.current_hp = round(player.current_hp, 2)
                             if player.current_hp >= player.max_hp:
                                 player.current_hp = player.max_hp
-                                print(f"\nYou are now max health, at {player.current_hp} HP!")
+                                print(f"\nYou are now max health, at {player.current_hp} HP!\n")
                             else:
-                                print(f"\nYou are now {player.current_hp} HP!")
+                                print(f"\nYou are now {player.current_hp} HP!\n")
                         elif itemchoice["type"] == "strength":
                             str_amount = itemchoice["amount"]
                             player.melee += str_amount
+                            str_amount = round(str_amount, 2)
+                            player.melee = round(player.melee, 2)
                             print(f"\nYou gained {str_amount} strength!")
                         elif itemchoice["type"] == "mana":
                             mana_amount = itemchoice["amount"]
+                            mana_amount = round(mana_amount, 2)
                             print(f"You gained {mana_amount} mana!")
                             player.current_mana += mana_amount
+                            player.current_mana = round(player.current_mana, 2)
                             if player.current_mana >= player.max_mana:
                                 player.current_mana = player.max_mana
                                 print(f"You are now at max mana, with {player.current_mana} mana!")
@@ -780,9 +808,9 @@ while True:
                     player.exp += enemy.exp
                     if player.chest_counter > 0:
                         player.chest_counter -= 1
+                        time.sleep(2)
                     else:
                         if rd.random() < 0.5:
                             player.openChest()
                             player.chest_counter = 3
-                    time.sleep(3)
                     os.system('cls' if os.name == 'nt' else 'clear')

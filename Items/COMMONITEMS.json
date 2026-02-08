@@ -1,14 +1,14 @@
 {
     "Strength Potion": {
         "type": "strength",
-        "amount": 0.8
+        "amount": 0.15
     },
-    "Heal Potion": {
+    "Health Potion": {
         "type": "heal",
-        "amount": 4.5
+        "amount": 7.0
     },
     "Mana Potion": {
         "type": "mana",
-        "amount": 5.0
+        "amount": 6.0
     }
 }

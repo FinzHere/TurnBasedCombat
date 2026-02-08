@@ -1,7 +1,7 @@
 {
     "Advanced Strength Potion": {
         "type": "strength",
-        "amount": 1.35
+        "amount": 0.2
     },
     "Advanced Heal Potion": {
         "type": "heal",
