@@ -1,0 +1,18 @@
+{
+    "Silver Powder":{
+        "type":"mana",
+        "amount": 11.5
+    },
+    "Staff Stamp":{
+        "type":"healsteal",
+        "amount":18.5
+    },
+    "Bull Summoning Whip":{
+        "type":"strength",
+        "amount":11.0
+    },
+    "Horn Of The Saints":{
+        "type":"attack",
+        "amount": 22.5
+    }
+}

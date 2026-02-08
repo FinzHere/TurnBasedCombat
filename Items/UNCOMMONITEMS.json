@@ -1,0 +1,18 @@
+{
+    "Advanced Strength Potion": {
+        "type": "strength",
+        "amount": 1.35
+    },
+    "Advanced Heal Potion": {
+        "type": "heal",
+        "amount": 6.5
+    },
+    "Advanced Mana Potion": {
+        "type": "mana",
+        "amount": 9.5
+    },
+    "Swift Steal": {
+        "type": "healsteal",
+        "amount": 5
+    }
+}

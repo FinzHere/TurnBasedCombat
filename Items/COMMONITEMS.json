@@ -9,6 +9,6 @@
     },
     "Mana Potion": {
         "type": "mana",
-        "amount": 7.0
+        "amount": 5.0
     }
 }

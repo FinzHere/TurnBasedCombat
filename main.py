@@ -6,14 +6,26 @@ import sys
 import enemies
 
 weapons = {
-    "Rusty Sword":5,
+    "Rusty Sword": 5.0,
 }
 
 L10spells = {
-    "Mana Burst": 5.5,
-    "Astral Flare": 6.5,
-    "Hex": 7.7,
-    "Blightcast": 11,
+    "Mana Burst": {
+        "type": "attack",
+        "amount": 5.5
+    },
+    "Astral Flare": {
+        "type": "attack",
+        "amount": 6.5
+    },
+    "Hex": {
+        "type":"attack",
+        "amount": 7.7
+    },
+    "Blightcast": {
+        "type":"attack",
+        "amount": 11.0
+    },
 }
 
 spells = {
@@ -44,8 +56,6 @@ spell_unlock = False
 
 current_profile = 1
 
-item_counter = 0
-
 mainmenucon = True
 gameloop = True
 fighting = True
@@ -58,14 +68,21 @@ stop = False
 
 has_encountered = False
 
+RARITY_BONUS = {
+    "COMMON": 0.1,
+    "UNCOMMON": 0.2,
+    "EPIC": 0.4,
+    "LEGENDARY": 0.6
+}
+
 player_dict = {
     "player_name":"Placeholder",
     "max_hp":25,
     "current_hp":25,
     "melee":1.00,
     "magicatk":1.00,
-    "max_mana":15,
-    "current_mana":15,
+    "max_mana":20,
+    "current_mana":20,
     "weapons":weapons,
     "armor":armor,
     "current_weapon":"Rusty Sword",
@@ -76,6 +93,8 @@ player_dict = {
     "spells":spells,
     "enemy_dificulty":1,
     "items":items,
+    "item_cooldown": 0,
+    "chest_counter": 3
 }
 
 show_player_dict = {
@@ -84,8 +103,8 @@ show_player_dict = {
     "current_hp":25,
     "melee":1.00,
     "magicatk":1.00,
-    "max_mana":15,
-    "current_mana":15,
+    "max_mana":20,
+    "current_mana":20,
     "weapons":weapons,
     "armor":armor,
     "current_weapon":"Rusty Sword",
@@ -134,6 +153,7 @@ def spellInform():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def create_profile(pn: int):
+    global current_profile
     file = f"Saves/P{pn}.json"
     os.system('cls' if os.name == 'nt' else 'clear')
     newname = str(input("Tell me, what is your name?").strip().capitalize())
@@ -142,8 +162,9 @@ def create_profile(pn: int):
         json.dump(player_dict, f, indent=4)
     current_profile = pn
 
+
 class Player:
-    def __init__(self, player_name: str, max_hp: float, current_hp: float, melee: float, magicatk: float, max_mana: float, current_mana: float, weapons: dict, armor: dict, current_weapon: str, current_armor: str, level: int, exp: int, enemies_killed: int, spells: dict, enemy_dificulty: float, items: dict,):
+    def __init__(self, player_name: str, max_hp: float, current_hp: float, melee: float, magicatk: float, max_mana: float, current_mana: float, weapons: dict, armor: dict, current_weapon: str, current_armor: str, level: int, exp: int, enemies_killed: int, spells: dict, enemy_dificulty: float, items: dict, item_cooldown: int, chest_counter: int,):
         self.player_name = player_name
         self.max_hp = max_hp
         self.current_hp = current_hp
@@ -161,6 +182,8 @@ class Player:
         self.spells = spells
         self.enemy_dificulty = enemy_dificulty
         self.items = items
+        self.item_cooldown = item_cooldown
+        self.chest_counter = chest_counter
 
     def rundown(self):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -206,6 +229,7 @@ class Player:
         print("\nYou saved your game!")
 
     def load(self, pn: int):
+        global current_profile
         file = f"Saves/P{pn}.json"
         with open(file, "r") as f:
             player_dict = json.load(f)
@@ -219,7 +243,7 @@ class Player:
                 self.current_hp = self.current_hp * 0.5
                 print(f"{self.current_hp} is now your current hp!")
                 time.sleep(2.5)
-            current_profile = pn
+        current_profile = pn
     
     def attack(self, enemy_health, enemy_name):
         print(enemy_health)
@@ -247,6 +271,7 @@ class Player:
             if self.spells[schoice]["type"] == "heal":
                 amount = self.spells[schoice]["amount"]
                 if self.current_mana >= amount:
+                    self.current_mana -= amount
                     amount = float(amount) * self.magicatk
                     amount = round(amount, 2)
                     return {"type": "heal", "amount": float(amount), "name": schoice}
@@ -255,6 +280,7 @@ class Player:
             elif self.spells[schoice]["type"] == "attack":
                 amount = self.spells[schoice]["amount"]
                 if self.current_mana >= amount:
+                    self.current_mana -= amount
                     amount = float(amount) * self.magicatk
                     amount = round(amount, 2)
                     return {"type": "attack", "amount": float(amount), "name": schoice}
@@ -272,8 +298,10 @@ class Player:
         itemchoice = input()
         if itemchoice in ["b", "back", "B", "Back"]:
             return "back"
-        elif (itemchoice in self.items) and item_counter == 0:
-            item_counter = 3
+        elif self.item_cooldown > 0:
+            return "cooldown"
+        elif (itemchoice in self.items):
+            self.item_cooldown = 3
             item_type = self.items[itemchoice]["type"]
             if item_type == "heal":
                 amount = self.items[itemchoice]["amount"]
@@ -284,9 +312,12 @@ class Player:
             elif item_type == "mana":
                 amount = self.items[itemchoice]["amount"]
                 return {"type": item_type, "amount": amount, "name": itemchoice}
-
-        elif (itemchoice in self.items):
-            return "cooldown"
+            elif item_type == "healsteal":
+                amount = self.items[itemchoice]["amount"]
+                return {"type": item_type, "amount": amount, "name": itemchoice}
+            elif item_type == "attack":
+                amount = self.items[itemchoice]["amount"]
+                return {"type": item_type, "amount": amount, "name": itemchoice}
         else:
             return "not_recognised"
 
@@ -325,6 +356,7 @@ class Player:
                     print(f"You gained magic attack points!\n")
                     self.magicatk += 0.25
                 self.enemy_dificulty += 0.1
+                self.enemy_dificulty = round(self.enemy_dificulty, 1)
                 time.sleep(2)
             else:
                 break
@@ -345,7 +377,7 @@ class Player:
             else:
                 itype = "ITEMS"
         rdecider = rd.random()
-        rdecider = round(decider, 2)
+        rdecider = round(rdecider, 2)
         if rdecider <= 0.57:
             rarity = "COMMON"
         elif 0.58 <= rdecider <= 0.80:
@@ -355,7 +387,7 @@ class Player:
         else:
             rarity = "LEGENDARY"
         path = f"Items/{rarity}{itype}.json"
-        print(f"You found a chest!")
+        print(f"\nYou found a chest!")
         time.sleep(2)
         print(f"The rarity is {rarity}...")
         time.sleep(2.5)
@@ -364,42 +396,44 @@ class Player:
             available_items: dict = json.load(f)
         weapon_name = rd.choice(list(available_items.keys()))
         to_add = available_items[weapon_name]
-        if weapon_name in self.spells:
+        bonus = RARITY_BONUS[rarity]
+        if itype == "SPELLS" and weapon_name in self.spells:
             print(f"You got {weapon_name}! It's a spell!")
             time.sleep(2)
             print(f"You already have {weapon_name}!")
             amount = self.spells[weapon_name]["amount"]
-            amount = float(amount) + 0.2
+            amount = float(amount) + bonus
             self.spells[weapon_name]["amount"] = amount
             time.sleep(1.5)
             print(f"You increased {weapon_name}'s power!")
-        elif weapon_name in self.weapons:
+        elif itype == "WEAPONS" and weapon_name in self.weapons:
             print(f"You got a {weapon_name}! It's a weapon!")
             time.sleep(2)
             print(f"You already have a {weapon_name}!")
             amount = self.weapons[weapon_name]
-            amount = float(amount) + 0.2
+            amount = float(amount) + bonus
             self.weapons[weapon_name] = amount
             time.sleep(1.5)
             print(f"You increased {weapon_name}'s power!")
-        elif weapon_name in self.items:
+        elif itype == "ITEMS" and weapon_name in self.items:
             print(f"You got a {weapon_name}! It's an item!")
             time.sleep(2)
             print(f"You already have a {weapon_name}!")
             amount = self.items[weapon_name]["amount"]
-            amount = float(amount) + 0.2
+            amount = float(amount) + bonus
             self.items[weapon_name]["amount"] = amount
             time.sleep(1.5)
             print(f"You increased {weapon_name}'s power!")
-        elif (itype.lower()) == "weapons":
+        elif itype == "WEAPONS":
             self.weapons[weapon_name] = to_add
             print(f"You got a {weapon_name} (weapon)!")
-        elif (itype.lower()) == "spells":
+        elif itype == "SPELLS":
             self.spells[weapon_name] = to_add
             print(f"You got a {weapon_name} (spell)!")
-        elif (itype.lower()) == "items":
+        elif itype == "ITEMS":
             self.items[weapon_name] = to_add
             print(f"You got a {weapon_name} (item)!")
+        input("Press enter to continue!")
     
     def die(self):
         if round(self.current_hp, 1) <= 0:
@@ -463,12 +497,12 @@ while mainmenucon:
             elif profile == "1":
                 if not(os.path.exists("Saves/P1.json")):
                     create_profile(1)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P1.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.load(1)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -476,12 +510,12 @@ while mainmenucon:
             elif profile == "2":
                 if not(os.path.exists("Saves/P2.json")):
                     create_profile(2)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P2.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.load(2)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -489,12 +523,12 @@ while mainmenucon:
             elif profile == "3":
                 if not(os.path.exists("Saves/P3.json")):
                     create_profile(3)
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.__dict__.update(player_dict)
                     mainmenucon = False
                     break
                 elif os.path.exists("Saves/P3.json"):
-                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {})
+                    player = Player("", 0, 0, 0, 0, 0, 0, {}, {}, "", "", 0, 0, 0, {}, 0, {}, 0, 0)
                     player.load(3)
                     print(f"\nSuccessfully loaded Profile {current_profile}!")
                     mainmenucon = False
@@ -630,6 +664,8 @@ while True:
                 print(f"\n{enemy.name} HEALTH: {enemy.current_health}")
 
                 while player_turn and (not(stop)):
+                    if player.item_cooldown > 0:
+                        print(f"\nItem Cooldown: {player.item_cooldown} turns remaining!")
                     print("\nWhat would you like to do?")
                     if player.spells:
                         q = "1-Attack, 2-Block, 3-Use an Item, 4-Run, 5-Use a Spell"
@@ -638,7 +674,7 @@ while True:
 
                     choice = str(input(q))
                     if choice == "1":
-                        enemy.current_health = player.attack(enemy.current_health)
+                        enemy.current_health = player.attack(enemy.current_health, enemy.name)
             
                     elif choice == "2":
                         print(f"You blocked {enemy.name}'s attack!")
@@ -658,12 +694,14 @@ while True:
                             if player.current_hp > player.max_hp:
                                 print("\nYou are now max HP!")
                                 player.current_hp = player.max_hp
+                            print(f"You are now at {player.current_mana} MANA!")
                             print(f"\nPlayer Health is now {player.current_hp}!\n")
                         elif spell["type"] == "attack":
                             damage = spell["amount"]
                             enemy.current_health -= damage
                             enemy.current_health = round(enemy.current_health, 1)
                             print(f"\nYou used {spell["name"]} against {enemy.name} and dealt {damage} damage!")
+                            print(f"You are now at {player.current_mana} MANA!")
                             print(f"{enemy.name} HEALTH: {enemy.current_health}\n")
                             
                     elif choice == "4":
@@ -677,8 +715,11 @@ while True:
 
                     elif choice == "3":
                         itemchoice = player.useItem()
-                        if itemchoice == "oom":
-                            print("\nYou are on cooldown!")
+                        if itemchoice == "cooldown":
+                            print(f"\nItem Cooldown: {player.item_cooldown} turns remaining!")
+                            continue
+                        elif itemchoice == "back":
+                            print("\nYou went back")
                             continue
                         elif itemchoice == "not_recognised":
                             print("\nSorry, the system did not recognise your input! Try again and spell it correctly!")
@@ -704,6 +745,23 @@ while True:
                                 print(f"You are now at max mana, with {player.current_mana} mana!")
                             else:
                                 print(f"You are now at {player.current_mana} mana!")
+                        elif itemchoice["type"] == "healsteal":
+                            steal_amount = itemchoice["amount"]
+                            enemy.current_health -= steal_amount
+                            player.current_hp += steal_amount
+                            player.current_hp = round(player.current_hp, 2)
+                            print(f"\nYou stole {steal_amount} of {enemy.name}'s HP!")
+                            if player.current_hp >= player.max_hp:
+                                player.current_hp = player.max_hp
+                            enemy.current_health = round(enemy.current_health, 2)
+                            print(f"\n{enemy.name}'s HP is now {enemy.current_health}!")
+                            print(f"Your HP is now {player.current_hp}!")
+                        elif itemchoice["type"] == "attack":
+                            attack_amount = itemchoice["amount"]
+                            enemy.current_health -= attack_amount
+                            enemy.current_health = round(enemy.current_health, 2)
+                            print(f"\nYou used {itemchoice["name"]} to attack {enemy.name} for {attack_amount} HP!")
+                            print(f"{enemy.name} is now {enemy.current_health} HP!")
                     else:
                         print(f"Sorry, {choice} is not one of the available options! Please pick again!")
                         continue
@@ -711,11 +769,20 @@ while True:
                     enemy_turn = True
                     player_turn = False
 
+                    if player.item_cooldown > 0:
+                        player.item_cooldown -= 1
+
                 if enemy.die():
                     gameloop = False
                     fighting = False
                     player.enemies_killed += 1
                     stop = True
                     player.exp += enemy.exp
+                    if player.chest_counter > 0:
+                        player.chest_counter -= 1
+                    else:
+                        if rd.random() < 0.5:
+                            player.openChest()
+                            player.chest_counter = 3
                     time.sleep(3)
                     os.system('cls' if os.name == 'nt' else 'clear')

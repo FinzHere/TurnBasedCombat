@@ -1,0 +1,14 @@
+{
+    "Bolder Summon": {
+        "type": "attack",
+        "amount": 15.6
+    },
+    "Supernatural Barrage":{
+        "type":"attack",
+        "amount":20.5
+    },
+    "Health Replenish": {
+        "type": "heal",
+        "amount": 21.5
+    }
+}

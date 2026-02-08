@@ -1,0 +1,18 @@
+{
+    "Blood Stealer": {
+        "type": "healsteal",
+        "amount": 28.5
+    },
+    "Mighty Mana Potion": {
+        "type": "mana",
+        "amount": 27.5
+    },
+    "Mighty Health Potion": {
+        "type": "heal",
+        "amount": 30.0
+    },
+    "Mighty Strength Potion": {
+        "type": "strength",
+        "amount": 3
+    }
+}

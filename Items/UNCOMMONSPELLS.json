@@ -1,0 +1,18 @@
+{
+    "Hex": {
+        "type":"attack",
+        "amount": 7.7
+    },
+    "Blightcast": {
+        "type":"attack",
+        "amount": 11.0
+    },
+    "Flesh Restore": {
+        "type": "heal",
+        "amount": 10.5
+    },
+    "Supernatural Punch": {
+        "type":"attack",
+        "amount": 9.0
+    }
+}

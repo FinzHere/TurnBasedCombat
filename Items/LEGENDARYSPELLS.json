@@ -1,0 +1,22 @@
+{
+    "Blood Barrage": {
+        "type": "attack",
+        "amount": 27.0
+    },
+    "Mana Unleash": {
+        "type": "attack",
+        "amount": 30.0
+    },
+    "Boulder Rain": {
+        "type": "attack",
+        "amount": 25.67
+    },
+    "Unchained Hex": {
+        "type": "attack",
+        "amount": 28.3
+    },
+    "Restoring Grace": {
+        "type": "heal",
+        "amount": 30.5
+    }
+}
